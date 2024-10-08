@@ -6,13 +6,17 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.items.app.models.Item;
 import com.items.app.models.Producto;
 import com.items.app.service.ItemService;
+
+import reactor.core.publisher.Mono;
 
 @Primary
 @Service
@@ -48,9 +52,23 @@ public class ItemWebClienteService implements ItemService{
 				.uri("http://ms-productos/productos/listar/{id}", params)
 				.accept(MediaType.APPLICATION_JSON)
 				.retrieve()
-				.bodyToMono(Producto.class)
-				.map(p -> new Item( p, 4 ))
-				.blockOptional();
-	}
+				.onStatus(
+		                status -> status.is4xxClientError(),  // Manejar errores 4xx
+		                clientResponse -> {
+		                    if (clientResponse.statusCode() == HttpStatus.NOT_FOUND) {
+		                        return Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto no encontrado"));
+		                    }
+		                    return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error de cliente"));
+		                }
+		            )
+		            .onStatus(
+		                status -> status.is5xxServerError(),  // Manejar errores 5xx
+		                clientResponse -> Mono.error(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error en el servidor"))
+		            )
+		            .bodyToMono(Producto.class)
+		            .map(p -> new Item(p, 4))
+		            .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto no encontrado")))
+		            .blockOptional();  // Si prefieres retornar Optional
+		}
 
 }
