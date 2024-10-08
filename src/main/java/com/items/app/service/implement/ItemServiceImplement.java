@@ -25,6 +25,7 @@ public class ItemServiceImplement implements ItemService {
 
 	@Override
 	public List<Item> findAll() {
+		System.out.println("normal");
 		return client.findAll().stream().map(x -> new Item( x, 4 )).toList();
 		
 	}
