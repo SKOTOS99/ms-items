@@ -11,10 +11,10 @@ import com.items.app.models.Producto;
 @FeignClient(name = "ms-productos")
 public interface FeingClient {
 	
-	@GetMapping("/productos/listar")
+	@GetMapping("/api/productos/listar")
 	List<Producto> findAll();
 		
-	@GetMapping("/productos/listar/{id}")
+	@GetMapping("/api/productos/listar/{id}")
 	 Producto listarProductoId(@PathVariable Long id);
 
 }

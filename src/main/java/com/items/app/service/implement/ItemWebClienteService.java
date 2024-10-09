@@ -34,7 +34,7 @@ public class ItemWebClienteService implements ItemService{
 		System.out.println("reactivo");
 		return this.client.build()
 				.get()
-				.uri("/productos/listar")
+				.uri("/api/productos/listar")
 				.accept(MediaType.APPLICATION_JSON)
 				.retrieve()
 				.bodyToFlux(Producto.class)
@@ -49,7 +49,7 @@ public class ItemWebClienteService implements ItemService{
 		params.put("id", id);
 		return this.client.build()
 				.get()
-				.uri("/productos/listar/{id}", params)
+				.uri("/api/productos/listar/{id}", params)
 				.accept(MediaType.APPLICATION_JSON)
 				.retrieve()
 				.onStatus(
