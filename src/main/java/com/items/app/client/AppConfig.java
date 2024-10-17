@@ -15,33 +15,33 @@ import io.github.resilience4j.timelimiter.TimeLimiterConfig;
 public class AppConfig {
 	  
 	/**
-	 * slidingWindowSize(10): Esto significa que el circuit breaker observará los
-	 * últimos 10 intentos (o llamadas) para determinar si algo está fallando. Si en
-	 * esos 10 intentos, más de un cierto porcentaje de ellos fallan, el circuito se
-	 * abrirá.
+	 * slidingWindowSize(10): Define el número de intentos (llamadas) que el circuit
+	 * breaker tendrá en cuenta para calcular si debe abrirse o no. En este caso,
+	 * está observando los últimos 10 intentos.
 	 * 
-	 * failureRateThreshold(50): Esto indica que si el 50% o más de las últimas 10
-	 * llamadas fallan, entonces el circuit breaker se "abrirá". Es decir, si la
-	 * tasa de fallos es mayor o igual al 50%, el sistema dejará de hacer más
-	 * intentos a esa parte del servicio.
+	 * failureRateThreshold(50): Si el 50%
+	 * de esos últimos 10 intentos fallan, el circuit breaker se abrirá (esto
+	 * significa que no se podrán hacer más solicitudes hasta que el circuito se
+	 * recupere).
+	 *  
+	 * waitDurationInOpenState(Duration.ofSeconds(10)): Cuando el
+	 * circuito está abierto (debido a fallos), se espera 10 segundos antes de
+	 * permitir cualquier nueva solicitud. Durante este tiempo, el circuit breaker
+	 * no permite llamadas para evitar sobrecargar el sistema.
 	 * 
-	 * waitDurationInOpenState(Duration.ofSeconds(10L)): Cuando el circuit breaker
-	 * está abierto (es decir, cuando se ha detectado un número elevado de fallos),
-	 * permanecerá en este estado durante 10 segundos antes de permitir que se
-	 * vuelvan a hacer intentos (estado "semiabierto").
+	 * permittedNumberOfCallsInHalfOpenState(5): Cuando el circuito pasa a estado
+	 * semiabierto (después de la espera en estado abierto), permite hasta 5
+	 * intentos para verificar si el sistema se ha recuperado. Si estas 5 llamadas
+	 * son exitosas, el circuito se cerrará de nuevo.
 	 * 
-	 * permittedNumberOfCallsInHalfOpenState(5): Cuando el circuit breaker está en
-	 * estado "semiabierto", se permitirá que se hagan 5 intentos. En este estado,
-	 * el sistema prueba si los problemas se han resuelto. Si estas 5 llamadas son
-	 * exitosas, el circuit breaker se cerrará (vuelve a permitir llamadas
-	 * normalmente). Si fallan, se abrirá nuevamente.
+	 * slowCallDurationThreshold(Duration.ofSeconds(2L)): Define un umbral para las
+	 * llamadas lentas. Si una llamada tarda más de 2 segundos, se considerará como
+	 * una llamada "lenta". 
 	 * 
-	 * Resilience4JConfigBuilder(id).circuitBreakerConfig(...)
-	 * 
-	 * Resilience4JConfigBuilder(id): Crea un configurador de circuit breaker con un
-	 * ID específico (usado para identificar este circuito en particular).
-	 * circuitBreakerConfig(...): Aquí es donde estás configurando las reglas que
-	 * definimos previamente (sliding window, failure rate, etc.).
+	 * slowCallRateThreshold(50): Si el 50% o más de las
+	 * llamadas son lentas, el circuito se abrirá. Esto ayuda a evitar que se
+	 * realicen demasiadas solicitudes lentas que puedan afectar el rendimiento del
+	 * sistema.
 	 * 
 	 * @return
 	 */
@@ -54,8 +54,11 @@ public class AppConfig {
 	                        .failureRateThreshold(50) // Si el 50% de los intentos fallan, el circuito se abre
 	                        .waitDurationInOpenState(Duration.ofSeconds(10)) // Espera de 10 segundos cuando el circuito está abierto
 	                        .permittedNumberOfCallsInHalfOpenState(5) // Solo se permiten 5 llamadas en estado semiabierto
-	                        .build()).timeLimiterConfig(TimeLimiterConfig.custom()
-	                        		.timeoutDuration(Duration.ofSeconds(3L)).build())
+	                        .slowCallDurationThreshold(Duration.ofSeconds(2L)) // Umbral para considerar una llamada como "lenta" si dura más de 2 segundos
+	                        .slowCallRateThreshold(50) // Si el 50% o más de las llamadas son lentas, el circuito se abrirá
+	                        .build())
+	                .timeLimiterConfig(TimeLimiterConfig.custom()
+	                        		.timeoutDuration(Duration.ofSeconds(4L)).build())
 	                .build();
 	    });
 	}
