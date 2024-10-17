@@ -16,4 +16,15 @@ public class Producto {
 	private Double precio;
 	private LocalDate createAt;
 	private int port;
+	
+	
+	public Producto(Long id, String nombre, Double precio, int port) {
+		super();
+		this.id = id;
+		this.nombre = nombre;
+		this.precio = precio;
+		this.port = port;
+	}
+	
+	
 }
