@@ -29,6 +29,19 @@ public class ItemWebClienteService implements ItemService{
 		this.client = client;
 	}
 
+	/*
+	 * .get(): Esto especifica que la solicitud HTTP será de tipo GET, es decir,
+	 * para obtener datos. .uri("/api/productos/listar"): Aquí se define la URI del
+	 * recurso al que se va a hacer la solicitud. En este caso, está solicitando los
+	 * productos en la ruta /api/productos/listar.
+	 * .accept(MediaType.APPLICATION_JSON): Esto indica que la respuesta que
+	 * esperamos del servidor será en formato JSON (especificando el tipo de
+	 * contenido que acepta el cliente). .retrieve(): Este método ejecuta la
+	 * solicitud y recupera la respuesta. .bodyToFlux(Producto.class): Convierte el
+	 * cuerpo de la respuesta en un Flux (un tipo de Mono o Flux de WebFlux, que es
+	 * un contenedor reactivo que representa una secuencia de datos). En este caso,
+	 * el cuerpo se deserializa en una secuencia de objetos Producto.
+	 */
 	@Override
 	public List<Item> findAll() {
 		System.out.println("reactivo");

@@ -43,7 +43,7 @@ public class ItemController {
 	@GetMapping("/item/listar/{id}")
 	public ResponseEntity<Item> listarPorId(@PathVariable Long id) {
 		Optional<Item> item = cb.create("items").run(()->service.findById(id), e->{
-			Item i = new Item(new Producto(1L,"sams",12.456, 888), 3);
+			Item i = new Item(new Producto(1L,"producto alternativo",12.456, 888), 3);
 					return Optional.of(i);
 		});
 		
