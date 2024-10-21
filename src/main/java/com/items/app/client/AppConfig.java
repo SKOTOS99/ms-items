@@ -58,7 +58,7 @@ public class AppConfig {
 	                        .slowCallRateThreshold(50) // Si el 50% o más de las llamadas son lentas, el circuito se abrirá
 	                        .build())
 	                .timeLimiterConfig(TimeLimiterConfig.custom()
-	                        		.timeoutDuration(Duration.ofSeconds(4L)).build())
+	                       .timeoutDuration(Duration.ofSeconds(3L)).build())
 	                .build();
 	    });
 	}
